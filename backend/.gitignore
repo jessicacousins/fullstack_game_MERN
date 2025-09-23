@@ -1,0 +1,38 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Env
+.env
+.env.*.local
+*.local
+
+# Dependencies
+node_modules/
+
+# Build / coverage / caches
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+temp/
+tmp/
+
+# Runtime dirs (if used)
+uploads/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
