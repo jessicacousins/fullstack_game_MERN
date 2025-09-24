@@ -10,6 +10,9 @@ lerna-debug.log*
 .env
 .env.*.local
 *.local
+./env.example
+./env.*local
+./env
 
 # Dependencies
 node_modules/
