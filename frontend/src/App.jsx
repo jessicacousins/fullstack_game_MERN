@@ -144,7 +144,8 @@ export default function App() {
         </div>
       )}
 
-      {view === "game" && <Game token={token} />}
+      {view === "game" && <Game token={token} me={user?.username} />}
+
       {error && <div className="error">{error}</div>}
 
       <footer className="foot">
@@ -157,15 +158,19 @@ export default function App() {
   );
 }
 
-function Game({ token }) {
+function Game({ token, me }) {
   const canvasRef = useRef(null);
   const socketRef = useRef(null);
   const [players, setPlayers] = useState([]);
   const [orbs, setOrbs] = useState([]);
   const [world, setWorld] = useState({ w: 1200, h: 800 });
 
+  const [showMiniMap, setShowMiniMap] = useState(true);
+  const [showRadar, setShowRadar] = useState(true);
+
   const keys = useRef({ up: false, down: false, left: false, right: false });
 
+  // connect + input
   useEffect(() => {
     const socket = io(API, { auth: { token } });
     socketRef.current = socket;
@@ -184,10 +189,19 @@ function Game({ token }) {
     const onKey = (e, v) => {
       if (e.repeat) return;
       const k = e.key.toLowerCase();
+
+      // movement
       if (["w", "arrowup"].includes(k)) keys.current.up = v;
       if (["s", "arrowdown"].includes(k)) keys.current.down = v;
       if (["a", "arrowleft"].includes(k)) keys.current.left = v;
       if (["d", "arrowright"].includes(k)) keys.current.right = v;
+
+      // toggles (only on keydown)
+      if (v === true) {
+        if (k === "m") setShowMiniMap((s) => !s);
+        if (k === "r") setShowRadar((s) => !s);
+      }
+
       socket.emit("move", keys.current);
     };
     const kd = (e) => onKey(e, true);
@@ -202,14 +216,33 @@ function Game({ token }) {
     };
   }, [token]);
 
-  // Draw loop
+  // helpers
+  function nearestOrbTo(x, y, orbs) {
+    let best = null,
+      bestD2 = Infinity;
+    for (const o of orbs) {
+      const dx = o.x - x,
+        dy = o.y - y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = o;
+      }
+    }
+    return best;
+  }
+
+  // draw
   useEffect(() => {
-    const ctx = canvasRef.current.getContext("2d");
-    let animationId;
+    const c = canvasRef.current;
+    const ctx = c.getContext("2d");
+    let animationId = 0;
 
     function draw() {
-      const { width, height } = canvasRef.current;
-      // background grid
+      const DPR = window.devicePixelRatio || 1;
+      const { width, height } = c;
+
+      // bg
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = "#0b1020";
       ctx.fillRect(0, 0, width, height);
@@ -217,20 +250,20 @@ function Game({ token }) {
       // subtle grid
       ctx.strokeStyle = "rgba(255,255,255,0.06)";
       ctx.lineWidth = 1;
-      for (let x = 0; x < width; x += 40) {
+      for (let x = 0; x < width; x += 40 * DPR) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
-      for (let y = 0; y < height; y += 40) {
+      for (let y = 0; y < height; y += 40 * DPR) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
         ctx.stroke();
       }
 
-      // fit world to canvas (center & scale)
+      // fit world
       const scale = Math.min(width / world.w, height / world.h);
       const ox = (width - world.w * scale) / 2;
       const oy = (height - world.h * scale) / 2;
@@ -239,7 +272,10 @@ function Game({ token }) {
       ctx.strokeStyle = "rgba(255,255,255,0.2)";
       ctx.strokeRect(ox, oy, world.w * scale, world.h * scale);
 
-      // orbs
+      // who am I?
+      const mePlayer = players.find((p) => p.name === me);
+
+      // draw orbs
       for (const o of orbs) {
         const x = ox + o.x * scale;
         const y = oy + o.y * scale;
@@ -247,7 +283,6 @@ function Game({ token }) {
         ctx.fillStyle = "rgba(80,200,255,0.9)";
         ctx.arc(x, y, 10 * scale, 0, Math.PI * 2);
         ctx.fill();
-        // glow
         const g = ctx.createRadialGradient(x, y, 0, x, y, 30 * scale);
         g.addColorStop(0, "rgba(80,200,255,0.7)");
         g.addColorStop(1, "rgba(80,200,255,0)");
@@ -257,7 +292,35 @@ function Game({ token }) {
         ctx.fill();
       }
 
-      // players & leaderboard
+      // radar: line to nearest orb
+      if (showRadar && mePlayer) {
+        const target = nearestOrbTo(mePlayer.x, mePlayer.y, orbs);
+        if (target) {
+          const sx = ox + mePlayer.x * scale;
+          const sy = oy + mePlayer.y * scale;
+          const tx = ox + target.x * scale;
+          const ty = oy + target.y * scale;
+
+          const t = (Date.now() % 1000) / 1000; // pulse
+          ctx.strokeStyle = `rgba(80,200,255,${
+            0.6 + 0.4 * Math.sin(t * Math.PI * 2)
+          })`;
+          ctx.lineWidth = Math.max(1.5, 3 * scale);
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(tx, ty);
+          ctx.stroke();
+
+          // highlight the target orb
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(255,255,255,0.8)";
+          ctx.lineWidth = 2;
+          ctx.arc(tx, ty, 16 * scale, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      // players + labels
       const scores = [];
       for (const p of players) {
         const x = ox + p.x * scale;
@@ -269,7 +332,7 @@ function Game({ token }) {
         ctx.fill();
 
         ctx.font = `${Math.max(12, 14 * scale)}px system-ui, sans-serif`;
-        ctx.fillStyle = "white";
+        ctx.fillStyle = p.name === me ? "#ffe680" : "white";
         ctx.fillText(p.name, x + 16 * scale, y - 10 * scale);
         ctx.fillText(`${p.score}`, x + 16 * scale, y + 8 * scale);
         scores.push({ name: p.name, score: p.score });
@@ -277,37 +340,73 @@ function Game({ token }) {
 
       // leaderboard (top-right)
       scores.sort((a, b) => b.score - a.score);
-      const pad = 10;
-      let lx = width - 220,
-        ly = 20;
+      const boxW = 208,
+        rowH = 22,
+        headH = 28;
+      const listN = Math.min(10, scores.length);
+      const lx =
+        width -
+        ((boxW + 16) * (window.devicePixelRatio || 1)) /
+          (window.devicePixelRatio || 1) -
+        8;
+      const ly = 20 * (window.devicePixelRatio || 1);
       ctx.fillStyle = "rgba(0,0,0,0.35)";
-      ctx.fillRect(lx - 8, ly - 8, 208, 28 + Math.min(10, scores.length) * 24);
+      ctx.fillRect(lx - 8, ly - 8, boxW, headH + listN * rowH);
       ctx.strokeStyle = "rgba(255,255,255,0.2)";
-      ctx.strokeRect(
-        lx - 8,
-        ly - 8,
-        208,
-        28 + Math.min(10, scores.length) * 24
-      );
+      ctx.strokeRect(lx - 8, ly - 8, boxW, headH + listN * rowH);
       ctx.fillStyle = "#fff";
       ctx.font = "16px system-ui, sans-serif";
       ctx.fillText("Leaderboard", lx, ly + 8);
       ctx.font = "14px system-ui, sans-serif";
-      for (let i = 0; i < Math.min(10, scores.length); i++) {
+      for (let i = 0; i < listN; i++) {
         ctx.fillText(
           `${i + 1}. ${scores[i].name} — ${scores[i].score}`,
           lx,
-          ly + 28 + i * 22
+          ly + 28 + i * rowH
         );
+      }
+
+      // mini-map (bottom-left)
+      if (showMiniMap) {
+        const mmW = 180 * (window.devicePixelRatio || 1);
+        const mmH = 120 * (window.devicePixelRatio || 1);
+        const pad = 12 * (window.devicePixelRatio || 1);
+        const mx = pad,
+          my = height - mmH - pad;
+        ctx.fillStyle = "rgba(0,0,0,0.45)";
+        ctx.fillRect(mx, my, mmW, mmH);
+        ctx.strokeStyle = "rgba(255,255,255,0.25)";
+        ctx.strokeRect(mx, my, mmW, mmH);
+
+        const mScale = Math.min(mmW / world.w, mmH / world.h);
+        const mOx = mx + (mmW - world.w * mScale) / 2;
+        const mOy = my + (mmH - world.h * mScale) / 2;
+
+        // draw orbs on minimap
+        ctx.fillStyle = "rgba(80,200,255,0.9)";
+        for (const o of orbs) {
+          ctx.fillRect(mOx + o.x * mScale - 2, mOy + o.y * mScale - 2, 4, 4);
+        }
+
+        // draw players on minimap
+        for (const p of players) {
+          ctx.fillStyle = p.name === me ? "#ffe680" : "#ffffff";
+          ctx.fillRect(mOx + p.x * mScale - 2, mOy + p.y * mScale - 2, 4, 4);
+        }
+
+        // title
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font = "12px system-ui, sans-serif";
+        ctx.fillText("Mini-Map (M)", mx + 8, my + 16);
       }
 
       animationId = requestAnimationFrame(draw);
     }
 
     function onResize() {
-      const c = canvasRef.current;
-      c.width = c.clientWidth * window.devicePixelRatio;
-      c.height = c.clientHeight * window.devicePixelRatio;
+      const DPR = window.devicePixelRatio || 1;
+      c.width = c.clientWidth * DPR;
+      c.height = c.clientHeight * DPR;
     }
     onResize();
     window.addEventListener("resize", onResize);
@@ -317,13 +416,14 @@ function Game({ token }) {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", onResize);
     };
-  }, [players, orbs, world]);
+  }, [players, orbs, world, showMiniMap, showRadar, me]);
 
   return (
     <div className="game-wrap">
       <div className="controls">
         <span>Move: WASD / ↑↓←→</span>
         <span>Goal: Collect orbs — endless loop</span>
+        <span>Mini-Map: M • Radar: R</span>
       </div>
       <canvas ref={canvasRef} className="game-canvas" />
     </div>

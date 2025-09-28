@@ -581,3 +581,407 @@ body::after {
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap");
+
+
+:root {
+  /* Previous variables remain the same */
+  
+  /* Additional accent colors */
+  --retro-red: #ff0055;
+  --retro-teal: #00ffcc;
+  --retro-gold: #ffcc00;
+  --retro-indigo: #6a0dad;
+  
+  /* New effect variables */
+  --glow-red: rgba(255, 0, 85, 0.7);
+  --glow-teal: rgba(0, 255, 204, 0.7);
+  --glow-gold: rgba(255, 204, 0, 0.7);
+  
+  /* Animation timing */
+  --fast: 0.2s;
+  --medium: 0.4s;
+  --slow: 0.8s;
+}
+
+/* Animated Background Particles */
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-20px) translateX(10px); }
+  50% { transform: translateY(-10px) translateX(-10px); }
+  75% { transform: translateY(15px) translateX(5px); }
+}
+
+.particle {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: -1;
+  animation: float 15s infinite;
+}
+
+.particle::before {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--neon-blue);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* Enhanced Header with Animated Elements */
+.topbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.topbar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.2), transparent);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Enhanced User Box with Status Indicator */
+.userbox {
+  position: relative;
+}
+
+.userbox::before {
+  content: "●";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: var(--neon-green);
+  font-size: 12px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Supercharged Buttons with Multiple Effects */
+.ghost {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.ghost::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.ghost:hover::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Form Cards with 3D Effect */
+.card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.card:hover .card-inner {
+  transform: rotateY(5deg) rotateX(5deg);
+}
+
+/* Enhanced Input Fields */
+.card input {
+  position: relative;
+  z-index: 1;
+}
+
+.card input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+}
+
+.card input:focus::placeholder {
+  color: rgba(0, 245, 255, 0.6);
+}
+
+/* Glowing Submit Button */
+.card button {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.card button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue), var(--neon-purple));
+  z-index: -1;
+  transition: opacity 0.3s;
+  opacity: 0.8;
+}
+
+.card button:hover::before {
+  opacity: 1;
+}
+
+.card button::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: rgba(26, 26, 46, 0.9);
+  border-radius: 10px;
+  z-index: -1;
+  transition: opacity 0.3s;
+}
+
+.card button:hover::after {
+  opacity: 0.3;
+}
+
+/* Enhanced Error Message */
+.error {
+  position: relative;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Game Canvas with Enhanced Effects */
+.game-canvas {
+  position: relative;
+  overflow: hidden;
+}
+
+.game-canvas::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, transparent 30%, rgba(26, 26, 46, 0.2) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Enhanced Controls */
+.controls {
+  position: relative;
+}
+
+.controls::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue), var(--neon-purple));
+  opacity: 0.7;
+}
+
+/* Footer with Animated Elements */
+.foot {
+  position: relative;
+}
+
+.foot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+  animation: footerGlow 3s infinite;
+}
+
+@keyframes footerGlow {
+  0%, 100% { opacity: 0.5; width: 50%; left: 25%; }
+  50% { opacity: 1; width: 80%; left: 10%; }
+}
+
+/* Loading Animation */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--neon-blue);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Success Animation */
+@keyframes success {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success {
+  animation: success 0.5s ease-out;
+}
+
+/* Interactive Particles on Click */
+@keyframes particleFade {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-30px) scale(0); opacity: 0; }
+}
+
+.click-particle {
+  position: absolute;
+  pointer-events: none;
+  width: 10px;
+  height: 10px;
+  background: var(--neon-blue);
+  border-radius: 50%;
+  animation: particleFade 0.8s ease-out forwards;
+}
+
+/* Neon Text Effect */
+.neon-text {
+  text-shadow: 
+    0 0 5px var(--neon-blue),
+    0 0 10px var(--neon-blue),
+    0 0 15px var(--neon-blue),
+    0 0 20px var(--neon-blue);
+}
+
+/* Holographic Card Effect */
+.holographic {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.holographic::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    transparent 70%);
+  background-size: 200% 200%;
+  animation: holographicShine 3s infinite;
+}
+
+@keyframes holographicShine {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .controls span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: white;
+    --text-secondary: white;
+    --border: 2px solid white;
+    --border-highlight: 2px solid white;
+  }
+}
+
+/* Focus Styles for Keyboard Navigation */
+button:focus, input:focus {
+  outline: 3px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 26, 46, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--neon-blue), var(--neon-purple));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--neon-pink), var(--neon-blue));
+}
