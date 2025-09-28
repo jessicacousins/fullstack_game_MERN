@@ -10,4 +10,8 @@ export function setAuthToken(token) {
   else delete api.defaults.headers.common["Authorization"];
 }
 
+export async function getMe() {
+  return api.get("/api/profile/me");
+}
+
 export default api;

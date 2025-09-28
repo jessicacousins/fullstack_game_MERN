@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import api, { setAuthToken } from "./api";
+// import api, { setAuthToken } from "./api";
+import api, { setAuthToken, getMe } from "./api";
 import io from "socket.io-client";
 import { useStore } from "./useStore";
 
@@ -22,6 +23,34 @@ export default function App() {
   useEffect(() => {
     if (token) setAuthToken(token);
   }, [token]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (useStore.getState().token) {
+          setBusy(true);
+          const res = await getMe();
+
+          setAuth(useStore.getState().token, {
+            id: res.data.id || res.data._id,
+            username: res.data.username,
+            displayName: res.data.displayName,
+            avatarHue: res.data.avatarHue,
+            bestScore: res.data.bestScore,
+            gamesPlayed: res.data.gamesPlayed,
+            totalScore: res.data.totalScore,
+          });
+          setView("game");
+        }
+      } catch {
+        logout();
+        setAuthToken(null);
+        setView("auth");
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, []);
 
   const clientMeta = useMemo(
     () => ({
@@ -70,7 +99,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <h1>Shared Fun</h1>
+        <h1>Orb Game</h1>
         {user ? (
           <div className="userbox">
             <span
