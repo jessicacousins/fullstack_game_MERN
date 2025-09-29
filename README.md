@@ -1,4 +1,4 @@
-# MERN Vite Fullstack Game
+# MERN Vite Fullstack - Orb Game
 
 ## Description
 

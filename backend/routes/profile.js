@@ -28,4 +28,14 @@ router.post("/display", authRequired, async (req, res) => {
   res.json({ displayName: user.displayName });
 });
 
+// Global leaderboard by lifetime totalScore
+// Public read; if you want to restrict, add authRequired.
+router.get("/leaderboard", async (_req, res) => {
+  const top = await User.find({}, "username avatarHue totalScore bestScore")
+    .sort({ totalScore: -1 })
+    .limit(20)
+    .lean();
+  res.json(top);
+});
+
 export default router;

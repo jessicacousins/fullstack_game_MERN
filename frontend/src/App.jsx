@@ -190,6 +190,8 @@ export default function App() {
 function Game({ token, me }) {
   const canvasRef = useRef(null);
   const socketRef = useRef(null);
+  const [globalTop, setGlobalTop] = useState([]);
+
   const [players, setPlayers] = useState([]);
   const [orbs, setOrbs] = useState([]);
   const [world, setWorld] = useState({ w: 1200, h: 800 });
@@ -198,6 +200,23 @@ function Game({ token, me }) {
   const [showRadar, setShowRadar] = useState(true);
 
   const keys = useRef({ up: false, down: false, left: false, right: false });
+
+  // global leaderboard fetch
+  useEffect(() => {
+    let stop = false;
+    async function fetchTop() {
+      try {
+        const { data } = await api.get("/api/profile/leaderboard");
+        if (!stop) setGlobalTop(data || []);
+      } catch {}
+    }
+    fetchTop();
+    const id = setInterval(fetchTop, 8000);
+    return () => {
+      stop = true;
+      clearInterval(id);
+    };
+  }, []);
 
   // connect + input
   useEffect(() => {
@@ -363,8 +382,8 @@ function Game({ token, me }) {
         ctx.font = `${Math.max(12, 14 * scale)}px system-ui, sans-serif`;
         ctx.fillStyle = p.name === me ? "#ffe680" : "white";
         ctx.fillText(p.name, x + 16 * scale, y - 10 * scale);
-        ctx.fillText(`${p.score}`, x + 16 * scale, y + 8 * scale);
-        scores.push({ name: p.name, score: p.score });
+        ctx.fillText(`${p.lifetime}`, x + 16 * scale, y + 8 * scale); // lifetime shown
+        scores.push({ name: p.name, score: p.lifetime });
       }
 
       // leaderboard (top-right)
@@ -379,6 +398,7 @@ function Game({ token, me }) {
           (window.devicePixelRatio || 1) -
         8;
       const ly = 20 * (window.devicePixelRatio || 1);
+
       ctx.fillStyle = "rgba(0,0,0,0.35)";
       ctx.fillRect(lx - 8, ly - 8, boxW, headH + listN * rowH);
       ctx.strokeStyle = "rgba(255,255,255,0.2)";
@@ -393,6 +413,34 @@ function Game({ token, me }) {
           lx,
           ly + 28 + i * rowH
         );
+      }
+
+      // --- Global leaderboard (lifetime totals, from HTTP) ---
+      const gx = lx;
+      let gy = ly + (headH + listN * rowH) + 20; // below in-room board
+      const gList = globalTop.slice(0, 10);
+      const gHeight = headH + gList.length * rowH;
+
+     
+      if (gy + gHeight + 12 > height) {
+        gy = Math.max(20, height - gHeight - 12);
+      }
+
+      // panel
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillRect(gx - 8, gy - 8, boxW, gHeight);
+      ctx.strokeStyle = "rgba(255,255,255,0.2)";
+      ctx.strokeRect(gx - 8, gy - 8, boxW, gHeight);
+
+      // title + rows
+      ctx.fillStyle = "#fff";
+      ctx.font = "16px system-ui, sans-serif";
+      ctx.fillText("Global Top (Lifetime)", gx, gy + 8);
+
+      ctx.font = "14px system-ui, sans-serif";
+      for (let i = 0; i < gList.length; i++) {
+        const row = `${i + 1}. ${gList[i].username} — ${gList[i].totalScore}`;
+        ctx.fillText(row, gx, gy + 28 + i * rowH);
       }
 
       // mini-map (bottom-left)
@@ -445,7 +493,7 @@ function Game({ token, me }) {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", onResize);
     };
-  }, [players, orbs, world, showMiniMap, showRadar, me]);
+  }, [players, orbs, world, showMiniMap, showRadar, me, globalTop]);
 
   return (
     <div className="game-wrap">
