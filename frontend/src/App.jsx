@@ -199,7 +199,37 @@ function Game({ token, me }) {
   const [showMiniMap, setShowMiniMap] = useState(true);
   const [showRadar, setShowRadar] = useState(true);
 
+  const [messages, setMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+
   const keys = useRef({ up: false, down: false, left: false, right: false });
+
+  // ⬇️ Paste this inside Game(), after `const [chatInput, setChatInput] = useState("")`
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const { data } = await api.get("/api/chat/recent");
+        if (!cancelled && Array.isArray(data)) {
+          // Oldest → newest in your UI
+          setMessages(
+            data.map((m) => ({
+              name: m.username,
+              hue: m.hue,
+              text: m.text,
+            }))
+          );
+        }
+      } catch {
+        // ignore preload failures
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // global leaderboard fetch
   useEffect(() => {
@@ -233,6 +263,10 @@ function Game({ token, me }) {
       setOrbs(orbs);
     });
     socket.on("error-msg", (m) => console.log("WS error:", m));
+
+    socket.on("chat", (msg) => {
+      setMessages((prev) => [...prev.slice(-30), msg]); // keep last 30
+    });
 
     const onKey = (e, v) => {
       if (e.repeat) return;
@@ -421,7 +455,6 @@ function Game({ token, me }) {
       const gList = globalTop.slice(0, 10);
       const gHeight = headH + gList.length * rowH;
 
-     
       if (gy + gHeight + 12 > height) {
         gy = Math.max(20, height - gHeight - 12);
       }
@@ -503,6 +536,31 @@ function Game({ token, me }) {
         <span>Mini-Map: M • Radar: R</span>
       </div>
       <canvas ref={canvasRef} className="game-canvas" />
+      <div className="chat-box">
+        <div className="chat-messages">
+          {messages.map((m, i) => (
+            <div key={i} className="chat-message">
+              <span style={{ color: `hsl(${m.hue} 80% 55%)` }}>{m.name}:</span>{" "}
+              {m.text}
+            </div>
+          ))}
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (chatInput.trim()) {
+              socketRef.current.emit("chat", chatInput);
+              setChatInput("");
+            }
+          }}
+        >
+          <input
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            placeholder="Type a message..."
+          />
+        </form>
+      </div>
     </div>
   );
 }
