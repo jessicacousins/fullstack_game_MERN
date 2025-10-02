@@ -204,7 +204,8 @@ function Game({ token, me }) {
 
   const keys = useRef({ up: false, down: false, left: false, right: false });
 
-  // ⬇️ Paste this inside Game(), after `const [chatInput, setChatInput] = useState("")`
+  const myScore = players.find((p) => p.name === me)?.lifetime || 0;
+
   useEffect(() => {
     let cancelled = false;
 
@@ -534,6 +535,21 @@ function Game({ token, me }) {
         <span>Move: WASD / ↑↓←→</span>
         <span>Goal: Collect orbs — endless loop</span>
         <span>Mini-Map: M • Radar: R</span>
+      </div>
+ 
+      <div className="hud">
+        <div className="chip">
+          You&nbsp;<strong>{me || "…"}</strong>
+        </div>
+        <div className="chip">
+          Score&nbsp;<strong>{myScore}</strong>
+        </div>
+        <div className="chip">
+          Players&nbsp;<strong>{players.length}</strong>
+        </div>
+        <div className="chip hide-sm">
+          Orbs&nbsp;<strong>{orbs.length}</strong>
+        </div>
       </div>
       <canvas ref={canvasRef} className="game-canvas" />
       <div className="chat-box">
