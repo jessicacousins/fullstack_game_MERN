@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-// import api, { setAuthToken } from "./api";
 import api, { setAuthToken, getMe } from "./api";
 import io from "socket.io-client";
 import { useStore } from "./useStore";
@@ -194,6 +193,7 @@ function Game({ token, me }) {
 
   const [players, setPlayers] = useState([]);
   const [orbs, setOrbs] = useState([]);
+  const [speedOrb, setSpeedOrb] = useState(null);
   const [world, setWorld] = useState({ w: 1200, h: 800 });
 
   const [showMiniMap, setShowMiniMap] = useState(true);
@@ -206,14 +206,13 @@ function Game({ token, me }) {
 
   const myScore = players.find((p) => p.name === me)?.lifetime || 0;
 
+  // preload recent chat
   useEffect(() => {
     let cancelled = false;
-
     (async () => {
       try {
         const { data } = await api.get("/api/chat/recent");
         if (!cancelled && Array.isArray(data)) {
-          // Oldest → newest in your UI
           setMessages(
             data.map((m) => ({
               name: m.username,
@@ -222,11 +221,8 @@ function Game({ token, me }) {
             }))
           );
         }
-      } catch {
-        // ignore preload failures
-      }
+      } catch {}
     })();
-
     return () => {
       cancelled = true;
     };
@@ -254,14 +250,16 @@ function Game({ token, me }) {
     const socket = io(API, { auth: { token } });
     socketRef.current = socket;
 
-    socket.on("world-init", ({ WORLD, orbs }) => {
+    socket.on("world-init", ({ WORLD, orbs, speedOrb }) => {
       setWorld(WORLD);
       setOrbs(orbs);
+      setSpeedOrb(speedOrb || null); // NEW
     });
     socket.on("players", (arr) => setPlayers(arr));
-    socket.on("state", ({ players, orbs }) => {
+    socket.on("state", ({ players, orbs, speedOrb }) => {
       setPlayers(players);
       setOrbs(orbs);
+      setSpeedOrb(speedOrb || null);
     });
     socket.on("error-msg", (m) => console.log("WS error:", m));
 
@@ -358,7 +356,7 @@ function Game({ token, me }) {
       // who am I?
       const mePlayer = players.find((p) => p.name === me);
 
-      // draw orbs
+      // draw normal orbs
       for (const o of orbs) {
         const x = ox + o.x * scale;
         const y = oy + o.y * scale;
@@ -373,6 +371,29 @@ function Game({ token, me }) {
         ctx.beginPath();
         ctx.arc(x, y, 30 * scale, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // --- Special rainbow Speed Booster orb (rare, single) ---
+      if (speedOrb) {
+        const t = (Date.now() % 4000) / 4000; // 0..1 cycle
+        const hue = Math.floor(t * 360);
+        const x = ox + speedOrb.x * scale;
+        const y = oy + speedOrb.y * scale;
+
+        const r = 12 * scale;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
+        g.addColorStop(0, `hsla(${hue}, 100%, 60%, 0.95)`);
+        g.addColorStop(1, `hsla(${(hue + 120) % 360}, 100%, 50%, 0.0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.lineWidth = Math.max(2, 3 * scale);
+        ctx.strokeStyle = `hsla(${(hue + 180) % 360}, 100%, 65%, 0.9)`;
+        ctx.beginPath();
+        ctx.arc(x, y, r + 6 * scale, 0, Math.PI * 2);
+        ctx.stroke();
       }
 
       // radar: line to nearest orb
@@ -417,13 +438,19 @@ function Game({ token, me }) {
         ctx.font = `${Math.max(12, 14 * scale)}px system-ui, sans-serif`;
         ctx.fillStyle = p.name === me ? "#ffe680" : "white";
         ctx.fillText(p.name, x + 16 * scale, y - 10 * scale);
-        ctx.fillText(`${p.lifetime}`, x + 16 * scale, y + 8 * scale); // lifetime shown
-        scores.push({ name: p.name, score: p.lifetime });
+        ctx.fillText(`${p.lifetime}`, x + 16 * scale, y + 8 * scale);
+
+        //  keep boosters per-player
+        scores.push({
+          name: p.name,
+          score: p.lifetime,
+          boosters: p.boosters || 0,
+        });
       }
 
       // leaderboard (top-right)
       scores.sort((a, b) => b.score - a.score);
-      const boxW = 208,
+      const boxW = 240, // widen slightly for ⚡
         rowH = 22,
         headH = 28;
       const listN = Math.min(10, scores.length);
@@ -444,7 +471,9 @@ function Game({ token, me }) {
       ctx.font = "14px system-ui, sans-serif";
       for (let i = 0; i < listN; i++) {
         ctx.fillText(
-          `${i + 1}. ${scores[i].name} — ${scores[i].score}`,
+          `${i + 1}. ${scores[i].name} — ${scores[i].score}  ⚡${
+            scores[i].boosters
+          }`,
           lx,
           ly + 28 + i * rowH
         );
@@ -473,7 +502,10 @@ function Game({ token, me }) {
 
       ctx.font = "14px system-ui, sans-serif";
       for (let i = 0; i < gList.length; i++) {
-        const row = `${i + 1}. ${gList[i].username} — ${gList[i].totalScore}`;
+        const boosters = gList[i].speedBoosters || 0; // NEW
+        const row = `${i + 1}. ${gList[i].username} — ${
+          gList[i].totalScore
+        }  ⚡${boosters}`;
         ctx.fillText(row, gx, gy + 28 + i * rowH);
       }
 
@@ -527,7 +559,7 @@ function Game({ token, me }) {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", onResize);
     };
-  }, [players, orbs, world, showMiniMap, showRadar, me, globalTop]);
+  }, [players, orbs, speedOrb, world, showMiniMap, showRadar, me, globalTop]);
 
   return (
     <div className="game-wrap">
@@ -536,7 +568,8 @@ function Game({ token, me }) {
         <span>Goal: Collect orbs — endless loop</span>
         <span>Mini-Map: M • Radar: R</span>
       </div>
- 
+
+      {/* HUD */}
       <div className="hud">
         <div className="chip">
           You&nbsp;<strong>{me || "…"}</strong>
@@ -551,7 +584,10 @@ function Game({ token, me }) {
           Orbs&nbsp;<strong>{orbs.length}</strong>
         </div>
       </div>
+
       <canvas ref={canvasRef} className="game-canvas" />
+
+      {/* Chat */}
       <div className="chat-box">
         <div className="chat-messages">
           {messages.map((m, i) => (

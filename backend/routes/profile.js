@@ -15,6 +15,8 @@ router.get("/me", authRequired, async (req, res) => {
     gamesPlayed: user.gamesPlayed,
     bestScore: user.bestScore,
     totalScore: user.totalScore,
+    // lifetime boosters
+    speedBoosters: user.speedBoosters || 0,
   });
 });
 
@@ -29,9 +31,13 @@ router.post("/display", authRequired, async (req, res) => {
 });
 
 // Global leaderboard by lifetime totalScore
-// Public read; if you want to restrict, add authRequired.
+// !  add authRequired.
 router.get("/leaderboard", async (_req, res) => {
-  const top = await User.find({}, "username avatarHue totalScore bestScore")
+  const top = await User.find(
+    {},
+    //  speedBoosters
+    "username avatarHue totalScore bestScore speedBoosters"
+  )
     .sort({ totalScore: -1 })
     .limit(20)
     .lean();

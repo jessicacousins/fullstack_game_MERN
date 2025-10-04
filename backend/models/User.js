@@ -31,6 +31,9 @@ const UserSchema = new mongoose.Schema(
     bestScore: { type: Number, default: 0 },
     totalScore: { type: Number, default: 0 },
 
+    // how many speed boosters collected (lifetime)
+    speedBoosters: { type: Number, default: 0 },
+
     // Simple analytics
     clientMeta: {
       ua: String,
