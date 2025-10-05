@@ -202,6 +202,36 @@ function Game({ token, me }) {
   const [messages, setMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
+  // ===  join/leave alerts ===
+  const [alerts, setAlerts] = useState([]);
+  const prevNamesRef = useRef(new Set());
+
+  function pushAlert(text, type = "join") {
+    const id =
+      (globalThis.crypto?.randomUUID && crypto.randomUUID()) ||
+      Math.random().toString(36).slice(2);
+    setAlerts((a) => [...a, { id, text, type }]);
+    setTimeout(() => {
+      setAlerts((a) => a.filter((x) => x.id !== id));
+    }, 4500);
+  }
+
+  function diffAndAlert(nextPlayers) {
+    const next = new Set(nextPlayers.map((p) => p.name));
+    const prev = prevNamesRef.current;
+
+    // joins
+    for (const name of next) {
+      if (!prev.has(name)) pushAlert(`${name} has joined the arena!`, "join");
+    }
+    // leaves
+    for (const name of prev) {
+      if (!next.has(name)) pushAlert(`${name} has left the arena.`, "leave");
+    }
+
+    prevNamesRef.current = next;
+  }
+
   const keys = useRef({ up: false, down: false, left: false, right: false });
 
   const myScore = players.find((p) => p.name === me)?.lifetime || 0;
@@ -253,10 +283,14 @@ function Game({ token, me }) {
     socket.on("world-init", ({ WORLD, orbs, speedOrb }) => {
       setWorld(WORLD);
       setOrbs(orbs);
-      setSpeedOrb(speedOrb || null); // NEW
+      setSpeedOrb(speedOrb || null);
     });
-    socket.on("players", (arr) => setPlayers(arr));
+    socket.on("players", (arr) => {
+      diffAndAlert(arr);
+      setPlayers(arr);
+    });
     socket.on("state", ({ players, orbs, speedOrb }) => {
+      diffAndAlert(players);
       setPlayers(players);
       setOrbs(orbs);
       setSpeedOrb(speedOrb || null);
@@ -583,6 +617,17 @@ function Game({ token, me }) {
         <div className="chip hide-sm">
           Orbs&nbsp;<strong>{orbs.length}</strong>
         </div>
+      </div>
+
+      {/*  join/leave popups */}
+      <div className="alerts">
+        {alerts.map((a) => (
+          <div key={a.id} className={`boss-alert ${a.type}`}>
+            <span className="ba-left">❯❯</span>
+            <span className="ba-text">{a.text}</span>
+            <span className="ba-right">❮❮</span>
+          </div>
+        ))}
       </div>
 
       <canvas ref={canvasRef} className="game-canvas" />
