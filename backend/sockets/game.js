@@ -14,6 +14,9 @@ const BOOST_SPAWN_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 const BOOST_DURATION_MS = 10 * 1000; // 10 seconds
 const BOOST_MULTIPLIER = 10;
 
+const LUCKY_VALUE = 20;
+const LUCKY_COOLDOWN_MS = 15 * 60 * 1000; // once per 15 minutes
+
 function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -37,6 +40,9 @@ export function initGame(io) {
   //!  single rare speed-boost orb (spawns at most once per cooldown)
   let speedOrb = null; // { id, x, y } | null
   let nextSpeedOrbAt = Date.now() + BOOST_SPAWN_COOLDOWN_MS;
+
+  let luckyOrb = null; // { id, x, y } | null
+  let nextLuckyAt = Date.now() + LUCKY_COOLDOWN_MS;
 
   function spawnOrb(i) {
     orbs[i] = {
@@ -62,10 +68,16 @@ export function initGame(io) {
     // Load player's lifetime totals from DB
     let lifetime = 0;
     let boostersFromDB = 0;
+
+    let luckyFromDB = 0;
+
     try {
       const doc = await User.findById(socket.data.user.id).lean();
       lifetime = doc?.totalScore || 0;
       boostersFromDB = doc?.speedBoosters || 0;
+      /* -------- NEW -------- */
+      luckyFromDB = doc?.luckyOrbs || 0;
+      /* --------------------- */
     } catch {}
 
     const colorHue = Math.floor(Math.random() * 360);
@@ -88,9 +100,17 @@ export function initGame(io) {
       // boosters & boost window
       boosters: boostersFromDB, // lifetime count (synced from DB)
       boostUntil: 0, // timestamp until which boost is active
+
+      lucky: luckyFromDB || 0,
     });
 
-    socket.emit("world-init", { WORLD, orbs, speedOrb });
+    io.emit("event", {
+      type: "player-join",
+      name: socket.data.user.username,
+      hue: colorHue,
+    });
+
+    socket.emit("world-init", { WORLD, orbs, speedOrb, luckyOrb });
     io.emit("players", Array.from(players.values()));
 
     socket.on("move", ({ up, down, left, right }) => {
@@ -143,6 +163,8 @@ export function initGame(io) {
             { $max: { bestScore: p.bestSession }, $inc: { gamesPlayed: 1 } }
           );
         } catch {}
+
+        io.emit("event", { type: "player-leave", name: p.name, hue: p.hue });
       }
     });
   });
@@ -156,6 +178,17 @@ export function initGame(io) {
         x: rand(60, WORLD.w - 60),
         y: rand(60, WORLD.h - 60),
       };
+    }
+
+    /* handle Lucky Orb rare spawn (single, on cooldown) */
+    if (!luckyOrb && Date.now() >= nextLuckyAt) {
+      luckyOrb = {
+        id: crypto.randomUUID(),
+        x: rand(60, WORLD.w - 60),
+        y: rand(60, WORLD.h - 60),
+      };
+      // announce spawn to clients (for popup + chime)
+      io.emit("event", { type: "lucky-spawn" });
     }
 
     // 1) update positions (apply boost multiplier when active)
@@ -202,9 +235,39 @@ export function initGame(io) {
             () => {}
           );
 
+          io.emit("event", { type: "boost-picked", name: p.name, hue: p.hue });
+
           // remove orb and schedule next spawn time
           speedOrb = null;
           nextSpeedOrbAt = Date.now() + BOOST_SPAWN_COOLDOWN_MS;
+          break;
+        }
+      }
+    }
+
+    /* collision with the Lucky Orb  */
+    if (luckyOrb) {
+      for (const p of players.values()) {
+        const fake = { x: luckyOrb.x, y: luckyOrb.y };
+        if (dist2(p, fake) < (RADIUS.player + RADIUS.orb) ** 2) {
+          // award +20
+          p.score += LUCKY_VALUE;
+          p.lifetime += LUCKY_VALUE;
+          if (p.score > p.bestSession) p.bestSession = p.score;
+
+          // session & lifetime lucky count
+          p.lucky = (p.lucky || 0) + 1;
+          User.updateOne(
+            { _id: p.uid },
+            { $inc: { totalScore: LUCKY_VALUE, luckyOrbs: 1 } }
+          ).catch(() => {});
+
+          // announce who picked it
+          io.emit("event", { type: "lucky-picked", name: p.name, hue: p.hue });
+
+          // clear and schedule next spawn
+          luckyOrb = null;
+          nextLuckyAt = Date.now() + LUCKY_COOLDOWN_MS;
           break;
         }
       }
@@ -215,6 +278,8 @@ export function initGame(io) {
       players: Array.from(players.values()),
       orbs,
       speedOrb,
+
+      luckyOrb,
     });
   }, TICK_MS);
 }

@@ -36,7 +36,7 @@ router.get("/leaderboard", async (_req, res) => {
   const top = await User.find(
     {},
     //  speedBoosters
-    "username avatarHue totalScore bestScore speedBoosters"
+    "username avatarHue totalScore bestScore speedBoosters luckyOrbs"
   )
     .sort({ totalScore: -1 })
     .limit(20)

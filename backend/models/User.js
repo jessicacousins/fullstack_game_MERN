@@ -34,6 +34,8 @@ const UserSchema = new mongoose.Schema(
     // how many speed boosters collected (lifetime)
     speedBoosters: { type: Number, default: 0 },
 
+    luckyOrbs: { type: Number, default: 0 },
+
     // Simple analytics
     clientMeta: {
       ua: String,

@@ -194,6 +194,7 @@ function Game({ token, me }) {
   const [players, setPlayers] = useState([]);
   const [orbs, setOrbs] = useState([]);
   const [speedOrb, setSpeedOrb] = useState(null);
+  const [luckyOrb, setLuckyOrb] = useState(null); //  (Lucky Orb)
   const [world, setWorld] = useState({ w: 1200, h: 800 });
 
   const [showMiniMap, setShowMiniMap] = useState(true);
@@ -202,35 +203,8 @@ function Game({ token, me }) {
   const [messages, setMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
-  // ===  join/leave alerts ===
-  const [alerts, setAlerts] = useState([]);
-  const prevNamesRef = useRef(new Set());
-
-  function pushAlert(text, type = "join") {
-    const id =
-      (globalThis.crypto?.randomUUID && crypto.randomUUID()) ||
-      Math.random().toString(36).slice(2);
-    setAlerts((a) => [...a, { id, text, type }]);
-    setTimeout(() => {
-      setAlerts((a) => a.filter((x) => x.id !== id));
-    }, 4500);
-  }
-
-  function diffAndAlert(nextPlayers) {
-    const next = new Set(nextPlayers.map((p) => p.name));
-    const prev = prevNamesRef.current;
-
-    // joins
-    for (const name of next) {
-      if (!prev.has(name)) pushAlert(`${name} has joined the arena!`, "join");
-    }
-    // leaves
-    for (const name of prev) {
-      if (!next.has(name)) pushAlert(`${name} has left the arena.`, "leave");
-    }
-
-    prevNamesRef.current = next;
-  }
+  //  (Event HUD): join/leave + booster/lucky notifications
+  const [events, setEvents] = useState([]);
 
   const keys = useRef({ up: false, down: false, left: false, right: false });
 
@@ -280,25 +254,44 @@ function Game({ token, me }) {
     const socket = io(API, { auth: { token } });
     socketRef.current = socket;
 
-    socket.on("world-init", ({ WORLD, orbs, speedOrb }) => {
+    socket.on("world-init", ({ WORLD, orbs, speedOrb, luckyOrb }) => {
       setWorld(WORLD);
       setOrbs(orbs);
       setSpeedOrb(speedOrb || null);
+      setLuckyOrb(luckyOrb || null);
     });
-    socket.on("players", (arr) => {
-      diffAndAlert(arr);
-      setPlayers(arr);
-    });
-    socket.on("state", ({ players, orbs, speedOrb }) => {
-      diffAndAlert(players);
+    socket.on("players", (arr) => setPlayers(arr));
+    socket.on("state", ({ players, orbs, speedOrb, luckyOrb }) => {
       setPlayers(players);
       setOrbs(orbs);
       setSpeedOrb(speedOrb || null);
+      setLuckyOrb(luckyOrb || null);
     });
     socket.on("error-msg", (m) => console.log("WS error:", m));
 
     socket.on("chat", (msg) => {
       setMessages((prev) => [...prev.slice(-30), msg]); // keep last 30
+    });
+
+    // N(Event HUD): server-driven announcements
+    socket.on("event", (evt) => {
+      if (!evt || !evt.type) return;
+      let text = "";
+      if (evt.type === "player-join") {
+        text = `➕ ${evt.name} joined`;
+      } else if (evt.type === "player-leave") {
+        text = `➖ ${evt.name} left`;
+      } else if (evt.type === "boost-picked") {
+        text = `⚡ ${evt.name} grabbed a Speed Booster!`;
+      } else if (evt.type === "lucky-spawn") {
+        text = `✨ Lucky Orb has spawned! (+20)`;
+        playChime(); // subtle chime on spawn
+      } else if (evt.type === "lucky-picked") {
+        text = `✨ ${evt.name} claimed the Lucky Orb! +20`;
+      } else {
+        return;
+      }
+      pushEvent(text);
     });
 
     const onKey = (e, v) => {
@@ -332,10 +325,10 @@ function Game({ token, me }) {
   }, [token]);
 
   // helpers
-  function nearestOrbTo(x, y, orbs) {
+  function nearestOrbTo(x, y, orbsArr) {
     let best = null,
       bestD2 = Infinity;
-    for (const o of orbs) {
+    for (const o of orbsArr) {
       const dx = o.x - x,
         dy = o.y - y;
       const d2 = dx * dx + dy * dy;
@@ -345,6 +338,30 @@ function Game({ token, me }) {
       }
     }
     return best;
+  }
+
+  // (Event HUD): event stack with auto-dismiss
+  function pushEvent(text) {
+    const id = Math.random().toString(36).slice(2);
+    setEvents((prev) => [...prev, { id, text }]);
+    setTimeout(() => {
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+    }, 3500);
+  }
+
+  // small chime using WebAudio (no external asset)
+  function playChime() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(660, ctx.currentTime);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+    o.connect(g).connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + 0.45);
   }
 
   // draw
@@ -407,7 +424,7 @@ function Game({ token, me }) {
         ctx.fill();
       }
 
-      // --- Special rainbow Speed Booster orb (rare, single) ---
+      // --- Special SPEED orb
       if (speedOrb) {
         const t = (Date.now() % 4000) / 4000; // 0..1 cycle
         const hue = Math.floor(t * 360);
@@ -428,6 +445,44 @@ function Game({ token, me }) {
         ctx.beginPath();
         ctx.arc(x, y, r + 6 * scale, 0, Math.PI * 2);
         ctx.stroke();
+      }
+
+      // --- Special LUCKY orb (+20) ---
+      if (luckyOrb) {
+        const x = ox + luckyOrb.x * scale;
+        const y = oy + luckyOrb.y * scale;
+
+        // shimmering gold starburst look
+        const r = 14 * scale;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
+        g.addColorStop(0, "rgba(255, 215, 0, 0.95)"); // gold core
+        g.addColorStop(1, "rgba(255, 215, 0, 0.0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // sparkle ring
+        ctx.lineWidth = Math.max(2, 3 * scale);
+        ctx.strokeStyle = "rgba(255, 230, 120, 0.95)";
+        ctx.beginPath();
+        ctx.arc(x, y, r + 6 * scale, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // little twinkles
+        ctx.fillStyle = "rgba(255,255,255,0.9)";
+        for (let i = 0; i < 6; i++) {
+          const a = (Date.now() / 300 + i) * (Math.PI / 3);
+          ctx.beginPath();
+          ctx.arc(
+            x + Math.cos(a) * (r + 8 * scale),
+            y + Math.sin(a) * (r + 8 * scale),
+            2.2 * scale,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        }
       }
 
       // radar: line to nearest orb
@@ -474,17 +529,18 @@ function Game({ token, me }) {
         ctx.fillText(p.name, x + 16 * scale, y - 10 * scale);
         ctx.fillText(`${p.lifetime}`, x + 16 * scale, y + 8 * scale);
 
-        //  keep boosters per-player
+        // include per-player lifetime boosters and lucky counts (server sends p.boosters & p.lucky)
         scores.push({
           name: p.name,
           score: p.lifetime,
           boosters: p.boosters || 0,
+          lucky: p.lucky || 0,
         });
       }
 
       // leaderboard (top-right)
       scores.sort((a, b) => b.score - a.score);
-      const boxW = 240, // widen slightly for ⚡
+      const boxW = 270, // widened to fit both ⚡ and ✨
         rowH = 22,
         headH = 28;
       const listN = Math.min(10, scores.length);
@@ -507,7 +563,7 @@ function Game({ token, me }) {
         ctx.fillText(
           `${i + 1}. ${scores[i].name} — ${scores[i].score}  ⚡${
             scores[i].boosters
-          }`,
+          }  ✨${scores[i].lucky}`,
           lx,
           ly + 28 + i * rowH
         );
@@ -536,10 +592,11 @@ function Game({ token, me }) {
 
       ctx.font = "14px system-ui, sans-serif";
       for (let i = 0; i < gList.length; i++) {
-        const boosters = gList[i].speedBoosters || 0; // NEW
+        const boosters = gList[i].speedBoosters || 0;
+        const lucky = gList[i].luckyOrbs || 0; // NEW
         const row = `${i + 1}. ${gList[i].username} — ${
           gList[i].totalScore
-        }  ⚡${boosters}`;
+        }  ⚡${boosters}  ✨${lucky}`;
         ctx.fillText(row, gx, gy + 28 + i * rowH);
       }
 
@@ -593,7 +650,17 @@ function Game({ token, me }) {
       cancelAnimationFrame(animationId);
       window.removeEventListener("resize", onResize);
     };
-  }, [players, orbs, speedOrb, world, showMiniMap, showRadar, me, globalTop]);
+  }, [
+    players,
+    orbs,
+    speedOrb,
+    luckyOrb,
+    world,
+    showMiniMap,
+    showRadar,
+    me,
+    globalTop,
+  ]);
 
   return (
     <div className="game-wrap">
@@ -617,17 +684,14 @@ function Game({ token, me }) {
         <div className="chip hide-sm">
           Orbs&nbsp;<strong>{orbs.length}</strong>
         </div>
-      </div>
-
-      {/*  join/leave popups */}
-      <div className="alerts">
-        {alerts.map((a) => (
-          <div key={a.id} className={`boss-alert ${a.type}`}>
-            <span className="ba-left">❯❯</span>
-            <span className="ba-text">{a.text}</span>
-            <span className="ba-right">❮❮</span>
-          </div>
-        ))}
+        {/*  event toasts */}
+        <div className="event-stack">
+          {events.map((e) => (
+            <div key={e.id} className="event-toast">
+              {e.text}
+            </div>
+          ))}
+        </div>
       </div>
 
       <canvas ref={canvasRef} className="game-canvas" />

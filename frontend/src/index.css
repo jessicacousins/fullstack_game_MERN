@@ -1344,7 +1344,6 @@ input:focus {
   }
 }
 
-/* mobile spacing */
 @media (max-width: 768px) {
   .alerts {
     top: 80px;
@@ -1352,5 +1351,52 @@ input:focus {
   .boss-alert {
     min-width: 220px;
     font-size: 12px;
+  }
+}
+
+/* ! Event HUD stack (join/leave, lucky spawn/pick, booster pick) */
+.event-stack {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 120;
+  pointer-events: none;
+}
+
+.event-toast {
+  background: linear-gradient(
+    90deg,
+    rgba(26, 26, 46, 0.9),
+    rgba(15, 52, 96, 0.9)
+  );
+  border: 1px solid rgba(0, 245, 255, 0.5);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 18px rgba(0, 245, 255, 0.25);
+  animation: toastPop 0.4s ease, toastFade 0.35s ease 3.1s forwards;
+}
+
+@keyframes toastPop {
+  from {
+    transform: translateX(-50%) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes toastFade {
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
   }
 }
