@@ -210,6 +210,10 @@ function Game({ token, me }) {
 
   const myScore = players.find((p) => p.name === me)?.lifetime || 0;
 
+  const [combo, setCombo] = useState({ count: 0, until: 0 });
+  const lastScoreRef = useRef(0);
+  const [comboNow, setComboNow] = useState(0);
+
   // preload recent chat
   useEffect(() => {
     let cancelled = false;
@@ -363,6 +367,38 @@ function Game({ token, me }) {
     o.start();
     o.stop(ctx.currentTime + 0.45);
   }
+
+  // Track my lifetime score and update combo when it increases
+  useEffect(() => {
+    const mePlayer = players.find((p) => p.name === me);
+    const current = mePlayer?.lifetime ?? 0;
+    const prev = lastScoreRef.current;
+
+    if (current > prev) {
+      setCombo((c) => {
+        const now = Date.now();
+        const active = now < c.until;
+        const next = {
+          count: active ? c.count + 1 : 1,
+          until: now + 3000, // 3s window
+        };
+        return next;
+      });
+    }
+    lastScoreRef.current = current;
+  }, [players, me]);
+
+  // Drive the shrinking progress for the Combo chip
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      const now = Date.now();
+      setComboNow(combo.until - now > 0 ? combo.until - now : 0);
+      if (combo.until > now) raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => cancelAnimationFrame(raf);
+  }, [combo.until]);
 
   // draw
   useEffect(() => {
@@ -684,6 +720,27 @@ function Game({ token, me }) {
         <div className="chip hide-sm">
           Orbs&nbsp;<strong>{orbs.length}</strong>
         </div>
+        {/* Combo chip (client-only visual) */}
+        {combo.count > 0 && (
+          <div
+            className="chip combo-chip"
+            title="Chain together quick orb pickups!"
+          >
+            Combo&nbsp;<strong>×{combo.count}</strong>
+            <span className="combo-bar">
+              <span
+                className="combo-fill"
+                style={{
+                  width: `${Math.max(
+                    0,
+                    Math.min(100, (comboNow / 3000) * 100)
+                  )}%`,
+                }}
+              />
+            </span>
+          </div>
+        )}
+
         {/*  event toasts */}
         <div className="event-stack">
           {events.map((e) => (
