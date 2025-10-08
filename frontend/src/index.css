@@ -1432,3 +1432,166 @@ input:focus {
   box-shadow: 0 0 10px rgba(255, 190, 11, 0.5);
   transition: width 120ms linear;
 }
+
+.game-canvas {
+  position: relative;
+  isolation: isolate;
+}
+.game-canvas::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(0, 245, 255, 0.25),
+    rgba(131, 56, 236, 0.25),
+    rgba(255, 0, 110, 0.25),
+    rgba(0, 245, 255, 0.25)
+  );
+  filter: blur(6px);
+  opacity: 0.55;
+  animation: canvasHalo 10s linear infinite;
+  z-index: -1;
+}
+@keyframes canvasHalo {
+  0% {
+    transform: rotate(0deg) scale(1.01);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.01);
+  }
+}
+
+.chip {
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 245, 255, 0.35);
+}
+.chip strong {
+  animation: glowPulse 2.4s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 6px rgba(0, 245, 255, 0.45);
+  }
+  50% {
+    text-shadow: 0 0 14px rgba(0, 245, 255, 0.75);
+  }
+}
+
+.event-toast {
+  transform-origin: center;
+  animation: toastPop 0.4s cubic-bezier(0.2, 1.4, 0.35, 1),
+    toastFade 0.35s ease 3.1s forwards;
+}
+@keyframes toastPop {
+  0% {
+    transform: translateX(-50%) translateY(-8px) scale(0.95);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-50%) translateY(0px) scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0px) scale(1);
+  }
+}
+
+.chat-messages .chat-message {
+  animation: msgIn 220ms ease forwards;
+  opacity: 0;
+  transform: translateY(4px);
+}
+@keyframes msgIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.chat-box input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.25) inset,
+    0 0 12px rgba(0, 245, 255, 0.35);
+  border-radius: 8px;
+}
+
+.controls {
+  background: linear-gradient(
+      90deg,
+      rgba(26, 26, 46, 0.7),
+      rgba(15, 52, 96, 0.7)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 245, 255, 0.12) 0 2px,
+      transparent 2px 6px
+    );
+}
+.controls::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 245, 255, 0.12),
+    transparent
+  );
+  animation: ribbonSweep 3.5s linear infinite;
+  pointer-events: none;
+}
+@keyframes ribbonSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.combo-fill {
+  background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange));
+  position: relative;
+}
+.combo-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 20%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  filter: blur(2px);
+  animation: barShine 1.3s linear infinite;
+}
+@keyframes barShine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+button,
+.ghost {
+  transition: transform 120ms ease, box-shadow 120ms ease !important;
+}
+button:hover,
+.ghost:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35), 0 0 14px rgba(0, 245, 255, 0.35);
+}
+
+.particle {
+  opacity: 0.45;
+}
