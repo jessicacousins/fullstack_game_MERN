@@ -115,6 +115,13 @@ export default function App() {
         ) : null}
       </header>
 
+      {/* ! welcome message  */}
+      {user && (
+        <div key={user.username} className="welcome-message">
+          Welcome{user.username ? `, ${user.username}` : ""}!
+        </div>
+      )}
+
       {view === "auth" && (
         <div className="authgrid">
           <form className="card" onSubmit={doSignup}>
