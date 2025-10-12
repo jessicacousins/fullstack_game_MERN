@@ -1620,7 +1620,7 @@ button:hover,
   text-shadow: 0 0 8px rgba(0, 245, 255, 0.8);
   opacity: 0;
   z-index: 9999;
-  animation: welcomeFade 3.5s ease-out forwards;
+  animation: welcomeFade 5.5s ease-out forwards;
 }
 
 @keyframes welcomeFade {
@@ -1628,6 +1628,11 @@ button:hover,
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
     filter: blur(6px);
+  }
+  10% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.05);
+    filter: blur(0);
   }
   20% {
     opacity: 1;
