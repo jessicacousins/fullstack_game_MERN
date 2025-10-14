@@ -1,12 +1,12 @@
 :root {
-  --bg-primary: #1a1a2e;
-  --bg-secondary: #16213e;
-  --bg-tertiary: #0f3460;
-  --surface: rgba(30, 30, 50, 0.8);
-  --surface-light: rgba(50, 50, 80, 0.6);
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #151928;
+  --bg-tertiary: #1a1f3a;
+  --surface: rgba(20, 25, 45, 0.85);
+  --surface-light: rgba(40, 45, 70, 0.7);
 
   --text-primary: #e94560;
-  --text-secondary: #f5f5f5;
+  --text-secondary: #f0f0f5;
   --text-accent: #ff6b6b;
 
   --neon-pink: #ff006e;
@@ -15,18 +15,21 @@
   --neon-green: #06ffa5;
   --neon-yellow: #ffbe0b;
   --neon-orange: #fb5607;
-  --retro-cyan: #00c9ff;
-  --retro-purple: #92fe9d;
+  --neon-cyan: #00c9ff;
+  --neon-magenta: #ff00cc;
+  --neon-lime: #ccff00;
 
-  --glow-pink: rgba(255, 0, 110, 0.7);
-  --glow-blue: rgba(0, 245, 255, 0.7);
-  --glow-purple: rgba(131, 56, 236, 0.7);
-  --glow-green: rgba(6, 255, 165, 0.7);
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --shadow-neon: 0 0 20px rgba(0, 245, 255, 0.5);
+  --glow-pink: rgba(255, 0, 110, 0.8);
+  --glow-blue: rgba(0, 245, 255, 0.8);
+  --glow-purple: rgba(131, 56, 236, 0.8);
+  --glow-green: rgba(6, 255, 165, 0.8);
+  --glow-cyan: rgba(0, 201, 255, 0.8);
+  --glow-magenta: rgba(255, 0, 204, 0.8);
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-neon: 0 0 25px rgba(0, 245, 255, 0.6);
 
   --border: 1px solid rgba(255, 255, 255, 0.1);
-  --border-highlight: 1px solid rgba(0, 245, 255, 0.5);
+  --border-highlight: 1px solid rgba(0, 245, 255, 0.6);
 }
 
 * {
@@ -42,7 +45,7 @@ body,
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #0a0e1a 0%, #151928 50%, #1a1f3a 100%);
   color: var(--text-secondary);
   font-family: "Rajdhani", "Segoe UI", "Roboto", sans-serif;
   position: relative;
@@ -55,8 +58,11 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px);
+  background-image: linear-gradient(
+      rgba(0, 245, 255, 0.08) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.08) 1px, transparent 1px);
   background-size: 40px 40px;
   z-index: -1;
 }
@@ -70,17 +76,17 @@ body::after {
   height: 100%;
   background: radial-gradient(
       circle at 20% 30%,
-      rgba(255, 0, 110, 0.2) 0%,
+      rgba(255, 0, 110, 0.25) 0%,
       transparent 25%
     ),
     radial-gradient(
       circle at 80% 70%,
-      rgba(0, 245, 255, 0.2) 0%,
+      rgba(0, 245, 255, 0.25) 0%,
       transparent 25%
     ),
     radial-gradient(
       circle at 40% 80%,
-      rgba(131, 56, 236, 0.2) 0%,
+      rgba(131, 56, 236, 0.25) 0%,
       transparent 25%
     );
   z-index: -1;
@@ -112,12 +118,12 @@ body::after {
   padding: 16px 24px;
   background: linear-gradient(
     90deg,
-    rgba(26, 26, 46, 0.9) 0%,
-    rgba(15, 52, 96, 0.9) 100%
+    rgba(10, 14, 26, 0.95) 0%,
+    rgba(26, 31, 58, 0.95) 100%
   );
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
   border-bottom: var(--border-highlight);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 100;
 }
@@ -133,8 +139,10 @@ body::after {
     90deg,
     var(--neon-pink),
     var(--neon-blue),
-    var(--neon-purple)
+    var(--neon-purple),
+    var(--neon-green)
   );
+  background-size: 300% 100%;
   animation: gradientShift 8s ease infinite;
 }
 
@@ -150,39 +158,51 @@ body::after {
 
 .topbar h1 {
   margin: 0;
-  font-size: 28px;
-  letter-spacing: 2px;
-  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 3px;
+  font-weight: 800;
   text-transform: uppercase;
   background: linear-gradient(
     90deg,
     var(--neon-pink),
     var(--neon-blue),
-    var(--neon-purple)
+    var(--neon-purple),
+    var(--neon-green)
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+  text-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
   font-family: "Orbitron", "Rajdhani", sans-serif;
+  animation: textGlow 3s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
 }
 
 .userbox {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   color: var(--text-secondary);
-  font-size: 14px;
-  padding: 8px 16px;
-  background: rgba(26, 26, 46, 0.7);
+  font-size: 15px;
+  padding: 10px 18px;
+  background: rgba(20, 25, 45, 0.8);
   border-radius: 30px;
   border: var(--border-highlight);
-  box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
 }
 
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) inset;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -197,16 +217,21 @@ body::after {
   right: -2px;
   bottom: -2px;
   border-radius: 50%;
-  background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+  background: linear-gradient(
+    45deg,
+    var(--neon-pink),
+    var(--neon-blue),
+    var(--neon-purple)
+  );
   z-index: -1;
-  opacity: 0.7;
+  opacity: 0.8;
   animation: avatarGlow 3s ease-in-out infinite;
 }
 
 @keyframes avatarGlow {
   0%,
   100% {
-    opacity: 0.7;
+    opacity: 0.8;
     transform: scale(1);
   }
   50% {
@@ -216,16 +241,16 @@ body::after {
 }
 
 .ghost {
-  background: rgba(26, 26, 46, 0.7);
+  background: rgba(20, 25, 45, 0.8);
   color: var(--text-secondary);
   border: var(--border-highlight);
-  padding: 10px 18px;
+  padding: 12px 20px;
   border-radius: 30px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 15px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -242,7 +267,7 @@ body::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(0, 245, 255, 0.3),
+    rgba(0, 245, 255, 0.4),
     transparent
   );
   transition: left 0.5s;
@@ -253,37 +278,37 @@ body::after {
 }
 
 .ghost:hover {
-  background: rgba(50, 50, 80, 0.8);
+  background: rgba(40, 45, 70, 0.9);
   border-color: var(--neon-blue);
-  box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
-  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
+  transform: translateY(-3px);
   color: var(--neon-blue);
 }
 
 .authgrid {
   display: grid;
-  gap: 30px;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  padding: 40px 24px;
+  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  padding: 50px 30px;
   max-width: 1200px;
-  margin: 50px auto;
+  margin: 60px auto;
   width: 100%;
 }
 
 .card {
   background: linear-gradient(
     135deg,
-    rgba(26, 26, 46, 0.9) 0%,
-    rgba(15, 52, 96, 0.8) 100%
+    rgba(20, 25, 45, 0.95) 0%,
+    rgba(26, 31, 58, 0.9) 100%
   );
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
   border: var(--border-highlight);
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
 }
 
 .card::before {
@@ -297,8 +322,10 @@ body::after {
     90deg,
     var(--neon-pink),
     var(--neon-blue),
-    var(--neon-purple)
+    var(--neon-purple),
+    var(--neon-green)
   );
+  background-size: 300% 100%;
   animation: gradientShift 8s ease infinite;
 }
 
@@ -311,7 +338,7 @@ body::after {
   height: 200%;
   background: radial-gradient(
     circle,
-    rgba(0, 245, 255, 0.1) 0%,
+    rgba(0, 245, 255, 0.15) 0%,
     transparent 70%
   );
   opacity: 0;
@@ -324,18 +351,18 @@ body::after {
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 40px rgba(0, 245, 255, 0.3);
+  transform: translateY(-10px);
+  box-shadow: 0 20px 45px rgba(0, 245, 255, 0.4);
 }
 
 .card h2 {
-  margin: 0 0 24px;
-  font-size: 26px;
-  font-weight: 700;
+  margin: 0 0 28px;
+  font-size: 28px;
+  font-weight: 800;
   color: var(--text-secondary);
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   font-family: "Orbitron", "Rajdhani", sans-serif;
   position: relative;
 }
@@ -343,24 +370,29 @@ body::after {
 .card h2::after {
   content: "";
   display: block;
-  width: 60px;
+  width: 80px;
   height: 3px;
-  background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
-  margin: 12px auto 0;
+  background: linear-gradient(
+    90deg,
+    var(--neon-pink),
+    var(--neon-blue),
+    var(--neon-purple)
+  );
+  margin: 15px auto 0;
   border-radius: 2px;
 }
 
 .card input {
   width: 100%;
-  margin: 16px 0;
-  padding: 16px 20px;
-  border-radius: 12px;
+  margin: 18px 0;
+  padding: 18px 22px;
+  border-radius: 14px;
   border: var(--border);
-  background: rgba(15, 52, 96, 0.7);
+  background: rgba(26, 31, 58, 0.8);
   color: var(--text-secondary);
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 1px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
   transition: all 0.3s ease;
   font-family: "Rajdhani", sans-serif;
 }
@@ -368,29 +400,36 @@ body::after {
 .card input:focus {
   outline: none;
   border-color: var(--neon-blue);
-  box-shadow: 0 0 0 4px rgba(0, 245, 255, 0.3);
-  background: rgba(15, 52, 96, 0.9);
+  box-shadow: 0 0 0 5px rgba(0, 245, 255, 0.35);
+  background: rgba(26, 31, 58, 0.95);
   color: var(--neon-blue);
 }
 
 .card button {
   width: 100%;
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 12px;
+  margin-top: 24px;
+  padding: 18px;
+  border-radius: 14px;
   border: none;
-  background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+  background: linear-gradient(
+    90deg,
+    var(--neon-pink),
+    var(--neon-blue),
+    var(--neon-purple)
+  );
+  background-size: 200% 100%;
   color: white;
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 800;
+  font-size: 19px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   font-family: "Orbitron", "Rajdhani", sans-serif;
-  box-shadow: 0 4px 15px rgba(0, 245, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 245, 255, 0.5);
+  animation: gradientShift 4s ease infinite;
 }
 
 .card button::before {
@@ -403,7 +442,7 @@ body::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.4),
     transparent
   );
   transform: translateX(-100%);
@@ -415,9 +454,8 @@ body::after {
 }
 
 .card button:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 245, 255, 0.5);
-  background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 245, 255, 0.6);
 }
 
 .card button:disabled {
@@ -425,72 +463,84 @@ body::after {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  animation: none;
 }
 
 .error {
   text-align: center;
   color: #ff6b6b;
-  margin: 20px auto;
-  background: rgba(255, 0, 110, 0.15);
-  border: 1px solid rgba(255, 0, 110, 0.3);
-  padding: 16px 24px;
+  margin: 25px auto;
+  background: rgba(255, 0, 110, 0.2);
+  border: 1px solid rgba(255, 0, 110, 0.4);
+  padding: 18px 26px;
   width: fit-content;
-  border-radius: 12px;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 25px rgba(255, 0, 110, 0.4);
   max-width: 80%;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
+  animation: errorPulse 2s ease-in-out infinite;
+}
+
+@keyframes errorPulse {
+  0%,
+  100% {
+    box-shadow: 0 6px 25px rgba(255, 0, 110, 0.4);
+  }
+  50% {
+    box-shadow: 0 6px 35px rgba(255, 0, 110, 0.7);
+  }
 }
 
 .game-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  gap: 20px;
+  padding: 25px;
+  gap: 25px;
   position: relative;
 }
 
 .controls {
   display: flex;
-  gap: 30px;
+  gap: 35px;
   color: var(--text-secondary);
-  font-size: 16px;
-  padding: 14px 20px;
-  background: rgba(26, 26, 46, 0.7);
-  border-radius: 12px;
+  font-size: 17px;
+  padding: 16px 24px;
+  background: rgba(20, 25, 45, 0.8);
+  border-radius: 14px;
   border: var(--border-highlight);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .controls span {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 600;
+  gap: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   font-family: "Rajdhani", sans-serif;
 }
 
 .controls span::before {
   content: "▶";
   color: var(--neon-pink);
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .game-canvas {
   width: 100%;
-  height: calc(100vh - 220px);
+  height: calc(100vh - 240px);
   display: block;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #0a0e1a 0%, #151928 50%, #1a1f3a 100%);
   border: var(--border-highlight);
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 245, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0, 245, 255, 0.5);
   position: relative;
   overflow: hidden;
 }
@@ -503,10 +553,10 @@ body::after {
   width: 100%;
   height: 100%;
   background-image: linear-gradient(
-      rgba(0, 245, 255, 0.05) 1px,
+      rgba(0, 245, 255, 0.06) 1px,
       transparent 1px
     ),
-    linear-gradient(90deg, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(0, 245, 255, 0.06) 1px, transparent 1px);
   background-size: 30px 30px;
   z-index: 0;
 }
@@ -514,95 +564,89 @@ body::after {
 .foot {
   text-align: center;
   color: var(--text-secondary);
-  font-size: 14px;
-  padding: 20px 0;
-  background: rgba(26, 26, 46, 0.7);
-  backdrop-filter: blur(5px);
+  font-size: 15px;
+  padding: 22px 0;
+  background: rgba(20, 25, 45, 0.8);
+  backdrop-filter: blur(10px);
   border-top: var(--border-highlight);
   font-family: "Rajdhani", sans-serif;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
 
 @media (max-width: 768px) {
   .authgrid {
     grid-template-columns: 1fr;
-    padding: 20px 16px;
-    margin: 30px auto;
+    padding: 25px 20px;
+    margin: 40px auto;
   }
 
   .topbar {
-    padding: 14px 18px;
+    padding: 14px 20px;
   }
 
   .topbar h1 {
-    font-size: 22px;
-    letter-spacing: 1px;
+    font-size: 24px;
+    letter-spacing: 2px;
   }
 
   .game-wrap {
-    padding: 14px;
+    padding: 18px;
   }
 
   .game-canvas {
-    height: calc(100vh - 180px);
+    height: calc(100vh - 200px);
   }
 
   .controls {
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     text-align: center;
-    font-size: 14px;
+    font-size: 15px;
   }
 }
 
 @media (max-width: 480px) {
   .card {
-    padding: 24px;
+    padding: 26px;
   }
 
   .card h2 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .card input {
-    padding: 14px 16px;
-    font-size: 15px;
-  }
-
-  .card button {
-    padding: 14px;
+    padding: 16px 18px;
     font-size: 16px;
   }
 
+  .card button {
+    padding: 16px;
+    font-size: 17px;
+  }
+
   .controls span {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap");
 
 :root {
-  /* Previous variables remain the same */
-
-  /* Additional accent colors */
   --retro-red: #ff0055;
   --retro-teal: #00ffcc;
   --retro-gold: #ffcc00;
   --retro-indigo: #6a0dad;
 
-  /* New effect variables */
-  --glow-red: rgba(255, 0, 85, 0.7);
-  --glow-teal: rgba(0, 255, 204, 0.7);
-  --glow-gold: rgba(255, 204, 0, 0.7);
+  --glow-red: rgba(255, 0, 85, 0.8);
+  --glow-teal: rgba(0, 255, 204, 0.8);
+  --glow-gold: rgba(255, 204, 0, 0.8);
 
-  /* Animation timing */
   --fast: 0.2s;
   --medium: 0.4s;
   --slow: 0.8s;
 }
 
-/* Animated Background Particles */
 @keyframes float {
   0%,
   100% {
@@ -622,7 +666,7 @@ body::after {
 .particle {
   position: fixed;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.6;
   z-index: -1;
   animation: float 15s infinite;
 }
@@ -637,7 +681,6 @@ body::after {
   box-shadow: 0 0 10px var(--neon-blue);
 }
 
-/* Enhanced Header with Animated Elements */
 .topbar {
   position: relative;
   overflow: hidden;
@@ -653,7 +696,7 @@ body::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(0, 245, 255, 0.2),
+    rgba(0, 245, 255, 0.3),
     transparent
   );
   animation: shimmer 3s infinite;
@@ -668,7 +711,6 @@ body::after {
   }
 }
 
-/* Enhanced User Box with Status Indicator */
 .userbox {
   position: relative;
 }
@@ -680,7 +722,7 @@ body::after {
   right: 10px;
   transform: translateY(-50%);
   color: var(--neon-green);
-  font-size: 12px;
+  font-size: 14px;
   animation: pulse 2s infinite;
 }
 
@@ -694,7 +736,6 @@ body::after {
   }
 }
 
-/* Supercharged Buttons with Multiple Effects */
 .ghost {
   position: relative;
   z-index: 1;
@@ -708,7 +749,7 @@ body::after {
   left: 50%;
   width: 5px;
   height: 5px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.6);
   opacity: 0;
   border-radius: 100%;
   transform: scale(1, 1) translate(-50%);
@@ -730,7 +771,6 @@ body::after {
   }
 }
 
-/* Enhanced Form Cards with 3D Effect */
 .card {
   transform-style: preserve-3d;
   perspective: 1000px;
@@ -749,7 +789,6 @@ body::after {
   transform: rotateY(5deg) rotateX(5deg);
 }
 
-/* Enhanced Input Fields */
 .card input {
   position: relative;
   z-index: 1;
@@ -757,14 +796,13 @@ body::after {
 
 .card input::placeholder {
   color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 }
 
 .card input:focus::placeholder {
   color: rgba(0, 245, 255, 0.6);
 }
 
-/* Glowing Submit Button */
 .card button {
   position: relative;
   overflow: hidden;
@@ -800,8 +838,8 @@ body::after {
   left: 2px;
   right: 2px;
   bottom: 2px;
-  background: rgba(26, 26, 46, 0.9);
-  border-radius: 10px;
+  background: rgba(20, 25, 45, 0.9);
+  border-radius: 12px;
   z-index: -1;
   transition: opacity 0.3s;
 }
@@ -810,7 +848,6 @@ body::after {
   opacity: 0.3;
 }
 
-/* Enhanced Error Message */
 .error {
   position: relative;
   animation: shake 0.5s;
@@ -836,7 +873,6 @@ body::after {
   }
 }
 
-/* Game Canvas with Enhanced Effects */
 .game-canvas {
   position: relative;
   overflow: hidden;
@@ -852,13 +888,12 @@ body::after {
   background: radial-gradient(
     circle at center,
     transparent 30%,
-    rgba(26, 26, 46, 0.2) 100%
+    rgba(20, 25, 45, 0.3) 100%
   );
   pointer-events: none;
   z-index: 1;
 }
 
-/* Enhanced Controls */
 .controls {
   position: relative;
 }
@@ -874,12 +909,14 @@ body::after {
     90deg,
     var(--neon-pink),
     var(--neon-blue),
-    var(--neon-purple)
+    var(--neon-purple),
+    var(--neon-green)
   );
-  opacity: 0.7;
+  background-size: 300% 100%;
+  animation: gradientShift 8s ease infinite;
+  opacity: 0.8;
 }
 
-/* Footer with Animated Elements */
 .foot {
   position: relative;
 }
@@ -914,11 +951,10 @@ body::after {
   }
 }
 
-/* Loading Spinner */
 .loading {
   display: inline-block;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   border-top-color: var(--neon-blue);
@@ -931,7 +967,6 @@ body::after {
   }
 }
 
-/* Success Animation */
 @keyframes success {
   0% {
     transform: scale(0.8);
@@ -950,7 +985,6 @@ body::after {
   animation: success 0.5s ease-out;
 }
 
-/* Progress Bar */
 .progress-bar {
   height: 4px;
   background: rgba(255, 255, 255, 0.1);
@@ -986,7 +1020,6 @@ body::after {
   }
 }
 
-/* Interactive Particles on Click */
 @keyframes particleFade {
   0% {
     transform: translateY(0) scale(1);
@@ -1008,13 +1041,11 @@ body::after {
   animation: particleFade 0.8s ease-out forwards;
 }
 
-/* Neon Text Effect */
 .neon-text {
   text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue),
     0 0 15px var(--neon-blue), 0 0 20px var(--neon-blue);
 }
 
-/* Holographic Card Effect */
 .holographic {
   position: relative;
   background: linear-gradient(
@@ -1052,11 +1083,10 @@ body::after {
   }
 }
 
-/* Responsive Improvements */
 @media (max-width: 768px) {
   .controls {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   .controls span {
@@ -1066,7 +1096,6 @@ body::after {
   }
 }
 
-/* Accessibility Improvements */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1077,7 +1106,6 @@ body::after {
   }
 }
 
-/* High Contrast Mode Support */
 @media (prefers-contrast: high) {
   :root {
     --text-primary: white;
@@ -1087,25 +1115,23 @@ body::after {
   }
 }
 
-/* Focus Styles for Keyboard Navigation */
 button:focus,
 input:focus {
   outline: 3px solid var(--neon-blue);
   outline-offset: 2px;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(26, 26, 46, 0.5);
+  background: rgba(20, 25, 45, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(var(--neon-blue), var(--neon-purple));
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -1114,60 +1140,61 @@ input:focus {
 
 .chat-box {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 280px;
-  max-height: 220px;
+  bottom: 25px;
+  left: 25px;
+  width: 300px;
+  max-height: 240px;
   display: flex;
   flex-direction: column;
-  background: rgba(26, 26, 46, 0.7);
+  background: rgba(20, 25, 45, 0.8);
   border: var(--border-highlight);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
   font-family: "Rajdhani", sans-serif;
   overflow: hidden;
   z-index: 3;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* positioning for desktop */
 @media (min-width: 769px) {
   .chat-box {
     left: auto;
-    right: 20px;
+    right: 25px;
   }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .chat-box {
     width: calc(100% - 40px);
-    max-width: 400px;
+    max-width: 420px;
     left: 20px;
     right: 20px;
-    bottom: 140px;
+    bottom: 150px;
   }
 }
 
-/* Small mobile  */
 @media (max-width: 480px) {
   .chat-box {
     width: calc(100% - 20px);
     left: 10px;
     right: 10px;
-    bottom: 130px;
-    max-height: 180px;
+    bottom: 140px;
+    max-height: 200px;
   }
 }
 
 .chat-messages {
   flex: 1;
-  padding: 8px;
+  padding: 12px;
   overflow-y: auto;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .chat-message {
-  margin: 2px 0;
+  margin: 4px 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(26, 31, 58, 0.6);
 }
 
 .chat-box form {
@@ -1177,45 +1204,46 @@ input:focus {
 
 .chat-box input {
   flex: 1;
-  padding: 8px;
+  padding: 12px;
   border: none;
   outline: none;
-  background: transparent;
+  background: rgba(26, 31, 58, 0.8);
   color: var(--text-secondary);
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
-/* ----- Floating HUD chips over the canvas ----- */
 .hud {
   position: absolute;
-  top: 84px; /* under the topbar */
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 12px;
-  z-index: 4; /* above canvas and chat */
-  pointer-events: none; /* clicks pass through */
+  gap: 16px;
+  z-index: 4;
+  pointer-events: none;
 }
 
 .chip {
-  pointer-events: auto; /* still clickable if you add actions later */
-  padding: 8px 14px;
+  pointer-events: auto;
+  padding: 10px 18px;
   border-radius: 999px;
-  background: rgba(26, 26, 46, 0.65);
+  background: rgba(20, 25, 45, 0.75);
   border: var(--border-highlight);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 14px rgba(0, 245, 255, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 18px rgba(0, 245, 255, 0.35);
   font-family: "Rajdhani", sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   position: relative;
   overflow: hidden;
 }
 
-/* gentle animated shine */
 .chip::after {
   content: "";
   position: absolute;
@@ -1223,7 +1251,7 @@ input:focus {
   background: linear-gradient(
     110deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.08) 40%,
+    rgba(255, 255, 255, 0.1) 40%,
     transparent 60%
   );
   transform: translateX(-100%);
@@ -1240,33 +1268,31 @@ input:focus {
 
 .chip strong {
   color: var(--neon-blue);
-  text-shadow: 0 0 8px rgba(0, 245, 255, 0.55);
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.7);
 }
 
-/* mobile tweaks */
 @media (max-width: 768px) {
   .hud {
-    top: 70px;
-    gap: 8px;
+    top: 75px;
+    gap: 10px;
   }
   .chip {
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
   }
   .hide-sm {
     display: none;
   }
 }
 
-/* ! ===== Boss-mod style alerts (join/leave) ===== */
 .alerts {
   position: absolute;
-  top: 96px;
+  top: 110px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   z-index: 6;
   pointer-events: none;
 }
@@ -1274,27 +1300,27 @@ input:focus {
 .boss-alert {
   --ring: var(--neon-blue);
   pointer-events: auto;
-  min-width: 280px;
+  min-width: 300px;
   max-width: 80vw;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border-radius: 999px;
   border: 1px solid var(--ring);
   background: radial-gradient(
       120% 120% at 50% -20%,
-      rgba(0, 245, 255, 0.25),
+      rgba(0, 245, 255, 0.3),
       rgba(0, 0, 0, 0)
     ),
-    rgba(26, 26, 46, 0.75);
-  box-shadow: 0 0 20px rgba(0, 245, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.35);
+    rgba(20, 25, 45, 0.85);
+  box-shadow: 0 0 25px rgba(0, 245, 255, 0.35), 0 12px 35px rgba(0, 0, 0, 0.4);
   color: var(--text-secondary);
   font-family: "Orbitron", "Rajdhani", sans-serif;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   animation: ba-pop 350ms ease-out, ba-fade 4.5s ease-in forwards;
 }
 
@@ -1308,7 +1334,7 @@ input:focus {
 .ba-left,
 .ba-right {
   opacity: 0.9;
-  text-shadow: 0 0 10px var(--ring);
+  text-shadow: 0 0 12px var(--ring);
 }
 
 .ba-text {
@@ -1346,23 +1372,22 @@ input:focus {
 
 @media (max-width: 768px) {
   .alerts {
-    top: 80px;
+    top: 90px;
   }
   .boss-alert {
-    min-width: 220px;
-    font-size: 12px;
+    min-width: 240px;
+    font-size: 13px;
   }
 }
 
-/* ! Event HUD stack (join/leave, lucky spawn/pick, booster pick) */
 .event-stack {
   position: absolute;
-  top: 80px;
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   z-index: 120;
   pointer-events: none;
 }
@@ -1370,17 +1395,17 @@ input:focus {
 .event-toast {
   background: linear-gradient(
     90deg,
-    rgba(26, 26, 46, 0.9),
-    rgba(15, 52, 96, 0.9)
+    rgba(20, 25, 45, 0.95),
+    rgba(26, 31, 58, 0.95)
   );
-  border: 1px solid rgba(0, 245, 255, 0.5);
+  border: 1px solid rgba(0, 245, 255, 0.6);
   color: #fff;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 0 18px rgba(0, 245, 255, 0.25);
+  letter-spacing: 1.2px;
+  box-shadow: 0 0 22px rgba(0, 245, 255, 0.35);
   animation: toastPop 0.4s ease, toastFade 0.35s ease 3.1s forwards;
 }
 
@@ -1397,30 +1422,29 @@ input:focus {
 @keyframes toastFade {
   to {
     opacity: 0;
-    transform: translateX(-50%) translateY(-6px);
+    transform: translateX(-50%) translateY(-8px);
   }
 }
 
-/* combo chip */
 .combo-chip {
   position: relative;
-  padding-right: 16px;
+  padding-right: 20px;
 }
 
 .combo-chip strong {
   color: var(--neon-yellow);
-  text-shadow: 0 0 8px rgba(255, 190, 11, 0.6);
+  text-shadow: 0 0 10px rgba(255, 190, 11, 0.7);
 }
 
 .combo-bar {
   position: relative;
   display: inline-block;
-  width: 80px;
-  height: 6px;
-  margin-left: 10px;
+  width: 90px;
+  height: 8px;
+  margin-left: 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
   overflow: hidden;
   vertical-align: middle;
 }
@@ -1429,7 +1453,7 @@ input:focus {
   display: block;
   height: 100%;
   background: linear-gradient(90deg, var(--neon-yellow), var(--neon-orange));
-  box-shadow: 0 0 10px rgba(255, 190, 11, 0.5);
+  box-shadow: 0 0 12px rgba(255, 190, 11, 0.6);
   transition: width 120ms linear;
 }
 
@@ -1440,17 +1464,17 @@ input:focus {
 .game-canvas::before {
   content: "";
   position: absolute;
-  inset: -2px;
-  border-radius: 18px;
+  inset: -3px;
+  border-radius: 22px;
   background: conic-gradient(
     from 0deg,
-    rgba(0, 245, 255, 0.25),
-    rgba(131, 56, 236, 0.25),
-    rgba(255, 0, 110, 0.25),
-    rgba(0, 245, 255, 0.25)
+    rgba(0, 245, 255, 0.3),
+    rgba(131, 56, 236, 0.3),
+    rgba(255, 0, 110, 0.3),
+    rgba(0, 245, 255, 0.3)
   );
-  filter: blur(6px);
-  opacity: 0.55;
+  filter: blur(8px);
+  opacity: 0.6;
   animation: canvasHalo 10s linear infinite;
   z-index: -1;
 }
@@ -1467,8 +1491,8 @@ input:focus {
   transition: transform 140ms ease, box-shadow 140ms ease;
 }
 .chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 245, 255, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 245, 255, 0.45);
 }
 .chip strong {
   animation: glowPulse 2.4s ease-in-out infinite;
@@ -1476,10 +1500,10 @@ input:focus {
 @keyframes glowPulse {
   0%,
   100% {
-    text-shadow: 0 0 6px rgba(0, 245, 255, 0.45);
+    text-shadow: 0 0 8px rgba(0, 245, 255, 0.55);
   }
   50% {
-    text-shadow: 0 0 14px rgba(0, 245, 255, 0.75);
+    text-shadow: 0 0 16px rgba(0, 245, 255, 0.85);
   }
 }
 
@@ -1490,7 +1514,7 @@ input:focus {
 }
 @keyframes toastPop {
   0% {
-    transform: translateX(-50%) translateY(-8px) scale(0.95);
+    transform: translateX(-50%) translateY(-10px) scale(0.95);
     opacity: 0;
   }
   60% {
@@ -1514,20 +1538,20 @@ input:focus {
   }
 }
 .chat-box input:focus {
-  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.25) inset,
-    0 0 12px rgba(0, 245, 255, 0.35);
-  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(0, 245, 255, 0.3) inset,
+    0 0 15px rgba(0, 245, 255, 0.4);
+  border-radius: 10px;
 }
 
 .controls {
   background: linear-gradient(
       90deg,
-      rgba(26, 26, 46, 0.7),
-      rgba(15, 52, 96, 0.7)
+      rgba(20, 25, 45, 0.8),
+      rgba(26, 31, 58, 0.8)
     ),
     repeating-linear-gradient(
       90deg,
-      rgba(0, 245, 255, 0.12) 0 2px,
+      rgba(0, 245, 255, 0.15) 0 2px,
       transparent 2px 6px
     );
 }
@@ -1538,7 +1562,7 @@ input:focus {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(0, 245, 255, 0.12),
+    rgba(0, 245, 255, 0.15),
     transparent
   );
   animation: ribbonSweep 3.5s linear infinite;
@@ -1563,14 +1587,14 @@ input:focus {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 20%;
+  width: 25%;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.45),
+    rgba(255, 255, 255, 0.5),
     transparent
   );
-  filter: blur(2px);
+  filter: blur(3px);
   animation: barShine 1.3s linear infinite;
 }
 @keyframes barShine {
@@ -1588,36 +1612,35 @@ button,
 }
 button:hover,
 .ghost:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35), 0 0 14px rgba(0, 245, 255, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 245, 255, 0.4);
 }
 
 .particle {
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
-/* ! new welcome message  */
 .welcome-message {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.95);
-  padding: 30px 60px;
+  padding: 35px 70px;
   background: radial-gradient(
       circle at 30% 30%,
-      rgba(0, 245, 255, 0.15),
+      rgba(0, 245, 255, 0.2),
       transparent 60%
     ),
-    rgba(26, 26, 46, 0.85);
-  border: 1px solid rgba(0, 245, 255, 0.5);
-  border-radius: 20px;
+    rgba(20, 25, 45, 0.9);
+  border: 1px solid rgba(0, 245, 255, 0.6);
+  border-radius: 25px;
   color: #fff;
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-family: "Orbitron", "Rajdhani", sans-serif;
   text-transform: uppercase;
-  letter-spacing: 3px;
-  box-shadow: 0 0 25px rgba(0, 245, 255, 0.4);
-  text-shadow: 0 0 8px rgba(0, 245, 255, 0.8);
+  letter-spacing: 4px;
+  box-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+  text-shadow: 0 0 12px rgba(0, 245, 255, 0.9);
   opacity: 0;
   z-index: 9999;
   animation: welcomeFade 5.5s ease-out forwards;
@@ -1627,7 +1650,7 @@ button:hover,
   0% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
-    filter: blur(6px);
+    filter: blur(8px);
   }
   10% {
     opacity: 0.95;
@@ -1646,6 +1669,6 @@ button:hover,
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.9);
-    filter: blur(8px);
+    filter: blur(10px);
   }
 }
