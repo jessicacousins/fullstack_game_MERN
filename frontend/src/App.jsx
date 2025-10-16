@@ -98,7 +98,10 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <h1>Orb</h1>
+        <h1 className="logo">
+          ORB
+          <span className="logo-bling" aria-hidden="true" />
+        </h1>
         {user ? (
           <div className="userbox">
             <span
